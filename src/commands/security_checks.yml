@@ -1,34 +1,34 @@
 description: >
   This command runs flake8 and security checks on a repo.
 parameters:
-dir:
-  description: the directory to run tests for
-  type: string
+  dir:
+    description: the directory to run tests for
+    type: string
 steps:
-- run:
-  name: Create Environment      # Does this really need to be here? Will other repos just set up their own environment?
-  command: |
-    python3 -m venv venv/    # security_checks_venv?
-    source venv/bin/activate
-  working_directory: << parameters.dir >>
-- run:
-  name: Run flake8     # Make sure each step here shows up as a separate task
-  command: |
-    source << parameters.dir >>venv/bin/activate
-    pip install flake8
-    safety check
-  working_directory: << parameters.dir >>
-- run:
-  name: Run Safety Check
-  command: |
-    source << parameters.dir >>venv/bin/activate
-    pip install safety
-    safety check
-  working_directory: << parameters.dir >>
-- run:
-  name: Run Bandit Check
-  command: |
-    source << parameters.dir >>/venv/bin/activate
-    pip install bandit
-    bandit -x '*/venv/*','*/tests/*' -r . -ll    # <--- lightly edited to run in current directory, make sure it works
-  working_directory: << parameters.dir >>
+  - run:
+      name: Create Environment      # Does this really need to be here? Will other repos just set up their own environment?
+      command: |
+        python3 -m venv venv/    # security_checks_venv?
+        source venv/bin/activate
+      working_directory: << parameters.dir >>
+  - run:
+      name: Run flake8     # Make sure each step here shows up as a separate task
+      command: |
+        source << parameters.dir >>venv/bin/activate
+        pip install flake8
+        safety check
+      working_directory: << parameters.dir >>
+  - run:
+      name: Run Safety Check
+      command: |
+        source << parameters.dir >>venv/bin/activate
+        pip install safety
+        safety check
+      working_directory: << parameters.dir >>
+  - run:
+      name: Run Bandit Check
+      command: |
+        source << parameters.dir >>/venv/bin/activate
+        pip install bandit
+        bandit -x '*/venv/*','*/tests/*' -r . -ll    # <--- lightly edited to run in current directory, make sure it works
+      working_directory: << parameters.dir >>

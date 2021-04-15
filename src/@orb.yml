@@ -5,5 +5,4 @@ description: >
 
 # This information will be displayed in the orb registry and is not mandatory.
 display:
-  home_url: "TBD"
   source_url: "https://www.github.com/civisanalytics/civis-integrations-sdk-security-orb"
