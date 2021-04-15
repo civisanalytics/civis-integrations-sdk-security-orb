@@ -55,7 +55,7 @@ workflows:
           #orb-name: <namespace>/<orb-name>
           orb-name: civisanalytics/civis-integrations-sdk-security-orb
           #context: <publishing-context> # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
-          context: Slack
+          context: test_delete_after_20200418
           requires:
             - orb-tools/lint
             - orb-tools/pack
@@ -66,7 +66,7 @@ workflows:
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
           #context: <publishing-context>
-          context: Slack
+          context: test_delete_after_20200418
           requires:
             - orb-tools/publish-dev
 
@@ -89,7 +89,7 @@ workflows:
           #orb-name: <namespace>/<orb-name>
           orb-name: civisanalytics/civis-integrations-sdk-security-orb
           #context: <publishing-context>
-          context: Slack
+          context: test_delete_after_20200418
           add-pr-comment: false
           fail-if-semver-not-indicated: true
           publish-version-tag: false
