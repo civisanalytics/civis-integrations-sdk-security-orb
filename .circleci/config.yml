@@ -100,3 +100,4 @@ workflows:
               only:
                 - master
                 - main
+                - civis-integrations-sdk-security-orb
