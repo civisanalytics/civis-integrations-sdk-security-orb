@@ -90,9 +90,9 @@ workflows:
           orb-name: civisanalytics/civis-integrations-sdk-security-orb
           #context: <publishing-context>
           context: test_delete_after_20200418
-          add-pr-comment: false
+          add-pr-comment: true
           fail-if-semver-not-indicated: true
-          publish-version-tag: false
+          publish-version-tag: true
           requires:
             - integration-test-1
           filters:
