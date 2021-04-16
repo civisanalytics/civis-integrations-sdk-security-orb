@@ -17,6 +17,7 @@ steps:
         source security_checks_venv/bin/activate
         pip install flake8
         pwd
+        ls
       working_directory: << parameters.dir >>
   - run:
       name: Run Safety Check
