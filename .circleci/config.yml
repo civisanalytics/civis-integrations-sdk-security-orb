@@ -100,4 +100,5 @@ workflows:
               only:
                 - master
                 - main
+                - de1133_initial_orb_setup
                 - civis-integrations-sdk-security-orb
