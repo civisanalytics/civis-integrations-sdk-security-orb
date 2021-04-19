@@ -5,10 +5,10 @@ parameters:
     description: the directory to run tests for
     type: string
     default: .
-  exlude_dirs:
+  exclude_dirs:
     description: a comma-separated list of directories or subfolders to exclude, i.e. "tests,dev"
     type: string
-    default: none
+    default: ""
 steps:
   - run:
       name: Create Environment
