@@ -31,5 +31,5 @@ steps:
       command: |
         source security_checks_venv/bin/activate
         pip install bandit
-        bandit -x '*/venv/*','*/tests/*' -r . -ll    # <--- lightly edited to run in current directory, make sure it works
+        bandit -x '*/security_checks_venv/*','*/tests/*' -r . -ll    # <--- lightly edited to run in current directory, make sure it works
       working_directory: << parameters.dir >>
