@@ -40,5 +40,5 @@ steps:
         FOR for TEMP_EXCLUDE in << parameters.exclude_dirs >>; do
             EXCLUDE_DIRS="${EXCLUDE_DIRS} -x */${TEMP_EXCLUDE}/*"
         done
-        bandit -x '*/security_checks_venv/*','*/externals/*','*/tests/*' -r . -ll ${EXCLUDE_DIRS}
+        bandit -x '*/security_checks_venv/*','*/tests/*' -r . -ll ${EXCLUDE_DIRS}
       working_directory: << parameters.dir >>
