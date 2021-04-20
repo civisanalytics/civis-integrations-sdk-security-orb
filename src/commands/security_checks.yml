@@ -39,7 +39,8 @@ steps:
         EXCLUDE_DIR_COMMANDS="'*/security_checks_venv/*','*/tests/*'"
         IFS=','
         for TEMP_EXCLUDE in $EXCLUDE_DIRS; do
-            EXCLUDE_DIR_COMMANDS="${EXCLUDE_DIR_COMMANDS},'*/${TEMP_EXCLUDE}/*'"
+            IFS=''
+            EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",'*/${TEMP_EXCLUDE}/*'"
         done
-        bandit -x ${EXCLUDE_DIR_COMMANDS} -r . -ll
+        bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
