@@ -36,11 +36,13 @@ steps:
         source security_checks_venv/bin/activate
         pip install bandit
         EXCLUDE_DIRS='<< parameters.exclude_dirs >>'
+        echo $EXCLUDE_DIRS
         EXCLUDE_DIR_COMMANDS="'*/security_checks_venv/*','*/tests/*'"
         IFS=','
         for TEMP_EXCLUDE in $EXCLUDE_DIRS; do
             IFS=''
             EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",'*/${TEMP_EXCLUDE}/*'"
         done
+        echo $EXCLUDE_DIR_COMMANDS
         bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
