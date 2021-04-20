@@ -43,6 +43,8 @@ steps:
             IFS=''
             EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",'*/${TEMP_EXCLUDE}/*'"
         done
+        echo pwd
+        echo ls -a
         echo $EXCLUDE_DIR_COMMANDS
         bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
