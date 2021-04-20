@@ -46,5 +46,6 @@ steps:
         echo pwd
         echo ls -a
         echo $EXCLUDE_DIR_COMMANDS
-        bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
+        bandit . -r -ll -x '*/security_checks_venv/*','*/tests/*','*/externals/*'
+        #bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
