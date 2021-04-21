@@ -20,7 +20,7 @@ steps:
       command: |
         source security_checks_venv/bin/activate
         pip install flake8
-        flake8
+        flake8 --exclude ./security_checks_venv
       working_directory: << parameters.dir >>
   - run:
       name: Run Safety Check
