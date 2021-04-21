@@ -16,11 +16,18 @@ steps:
         python3 -m venv security_checks_venv/
       working_directory: << parameters.dir >>
   - run:
-      name: Run flake8     # Make sure each step here shows up as a separate task
+      name: Run flake8
       command: |
         source security_checks_venv/bin/activate
         pip install flake8
-        flake8 --exclude ./security_checks_venv
+        EXCLUDE_DIRS='<< parameters.exclude_dirs >>'
+        EXCLUDE_DIR_COMMANDS="./security_checks_venv"
+        IFS=','
+        for TEMP_EXCLUDE in $EXCLUDE_DIRS; do
+            IFS=''
+            EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",./${TEMP_EXCLUDE}"
+        done
+        flake8 --exclude ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
   - run:
       name: Run Safety Check
