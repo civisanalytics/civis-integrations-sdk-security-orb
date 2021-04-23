@@ -12,7 +12,7 @@ usage:
         - image: circleci/python:3.7   # Change this to match your larger project configuration
       steps:
         - civis-integrations-sdk-security-orb/security_checks:
-            dir: ~/my_project   # directory where your project is located 
+            dir: ~/my_project   # directory where your project is located
             exclude_dirs: external_package,tests   # directories in your project you wish to exclude
   workflows:
     use-my-orb:
