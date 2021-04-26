@@ -86,6 +86,9 @@ workflows:
             - integration-test-1
           filters:
             branches:
+              # Any PR *to* one of these branches should trigger a production release.
+              # Assuming both the commit and PR are tagged appropriately (l.e. [semver:patch], etc.)
+              # See https://circleci.com/docs/2.0/creating-orbs/#issue-a-new-release
               only:
                 - master
                 - main
