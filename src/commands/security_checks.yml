@@ -5,32 +5,48 @@ parameters:
     description: the directory to run tests for
     type: string
     default: .
+  exclude_dirs:
+    description: a comma-separated list of directories or subfolders to exclude, i.e. "tests,dev"
+    type: string
+    default: ""
 steps:
   - run:
-      name: Create Environment      # Does this really need to be here? Will other repos just set up their own environment?
+      name: Create Environment
       command: |
-        python3 -m venv << parameters.dir >>/security_checks_venv/
-        source venv/bin/activate
+        python3 -m venv security_checks_venv/
       working_directory: << parameters.dir >>
   - run:
-      name: Run flake8     # Make sure each step here shows up as a separate task
+      name: Run flake8
       command: |
-        source << parameters.dir >>/security_checks_venv/bin/activate
+        source security_checks_venv/bin/activate
         pip install flake8
-        pwd
-        flake8 << parameters.dir >>
+        EXCLUDE_DIRS='<< parameters.exclude_dirs >>'
+        EXCLUDE_DIR_COMMANDS="./security_checks_venv"
+        IFS=','
+        for TEMP_EXCLUDE in $EXCLUDE_DIRS; do
+            IFS=''
+            EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",./${TEMP_EXCLUDE}"
+        done
+        flake8 --exclude ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>
   - run:
       name: Run Safety Check
       command: |
-        source << parameters.dir >>/security_checks_venv/bin/activate
+        source security_checks_venv/bin/activate
         pip install safety
         safety check
       working_directory: << parameters.dir >>
   - run:
       name: Run Bandit Check
       command: |
-        source << parameters.dir >>/security_checks_venv/bin/activate
+        source security_checks_venv/bin/activate
         pip install bandit
-        bandit -x '*/venv/*','*/tests/*' -r . -ll    # <--- lightly edited to run in current directory, make sure it works
+        EXCLUDE_DIRS='<< parameters.exclude_dirs >>'
+        EXCLUDE_DIR_COMMANDS="*/security_checks_venv/*,*/tests/*"
+        IFS=','
+        for TEMP_EXCLUDE in $EXCLUDE_DIRS; do
+            IFS=''
+            EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",./${TEMP_EXCLUDE}"
+        done
+        bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
       working_directory: << parameters.dir >>

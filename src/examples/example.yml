@@ -1,13 +1,20 @@
 description: >
   Sample example description.
-# Provide a use-case based example for using this orb.
-# Everything in the `usage` section will be displayed in the orb registry.
-# Comments are not retained.
+# Currently, security_checks is the primary job in this orb.
+# security_checks will execute flake8, safety check, and bandit in the directory provided.
 usage:
   version: 2.1
   orbs:
-    <orb-name>: <namespace>/<orb-name>@1.2.3
+    civis-integrations-sdk-security-orb: civisanalytics/civis-integrations-sdk-security-orb@dev:alpha
+  jobs:
+    civis_security_orb:
+      docker:
+        - image: circleci/python:3.7   # Change this to match your larger project configuration
+      steps:
+        - civis-integrations-sdk-security-orb/security_checks:
+            dir: ~/my_project   # directory where your project is located
+            exclude_dirs: external_package,tests   # directories in your project you wish to exclude
   workflows:
     use-my-orb:
       jobs:
-        - <orb-name>/<job-name>
+        - civis_security_orb
