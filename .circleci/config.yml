@@ -1,8 +1,6 @@
 version: 2.1
 
 orbs:
-  # Replace this with your own!
-  #<orb-name>: <namespace>/<orb-name>@<<pipeline.parameters.dev-orb-version>>
   civis-integrations-sdk-security: civisanalytics/civis-integrations-sdk-security-orb@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
   bats: circleci/bats@1.0
@@ -30,11 +28,6 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      # "greet" is a sample command packaged with this orb config.
-      # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
-      # Push new changes first, before adding new tests to your config.
-      #- <orb-name>/greet
-      #- civis-integrations-sdk-security/greet
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
@@ -52,10 +45,9 @@ workflows:
           path: ./src/tests
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
-          #orb-name: <namespace>/<orb-name>
           orb-name: civisanalytics/civis-integrations-sdk-security-orb
-          #context: <publishing-context> # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
-          context: test_delete_after_20200418
+          # Must be a context stored at https://app.circleci.com/settings/organization/github/civisanalytics/contexts
+          context: civis-integrations-sdk-security-orb
           requires:
             - orb-tools/lint
             - orb-tools/pack
@@ -65,8 +57,7 @@ workflows:
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
-          #context: <publishing-context>
-          context: test_delete_after_20200418
+          context: civis-integrations-sdk-security-orb
           requires:
             - orb-tools/publish-dev
 
@@ -86,10 +77,8 @@ workflows:
       # be skipped.
       # e.g. [semver:patch] will cause a patch version to be published.
       - orb-tools/dev-promote-prod-from-commit-subject:
-          #orb-name: <namespace>/<orb-name>
           orb-name: civisanalytics/civis-integrations-sdk-security-orb
-          #context: <publishing-context>
-          context: test_delete_after_20200418
+          context: civis-integrations-sdk-security-orb
           add-pr-comment: true
           fail-if-semver-not-indicated: true
           publish-version-tag: true
@@ -97,8 +86,10 @@ workflows:
             - integration-test-1
           filters:
             branches:
+              # Any PR *to* one of these branches should trigger a production release.
+              # Assuming both the commit and PR are tagged appropriately (l.e. [semver:patch], etc.)
+              # See https://circleci.com/docs/2.0/creating-orbs/#issue-a-new-release
               only:
                 - master
                 - main
                 - de1133_initial_orb_setup
-                - civis-integrations-sdk-security-orb
