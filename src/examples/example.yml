@@ -1,0 +1,26 @@
+description: >
+  Sample example description.
+# Currently, security_checks is the primary job in this orb.
+# security_checks will execute flake8, safety check, and bandit in the directory provided.
+usage:
+  version: 2.1
+  orbs:
+    civis-integrations-sdk-security-orb: civisanalytics/civis-integrations-sdk-security-orb@dev:alpha
+  jobs:
+    civis_security_orb:
+      docker:
+        - image: circleci/python:3.7   # Change this to match your larger project configuration
+      steps:
+        # Before running the security orb, you need to do something to get your code into the environment.
+        # One way is to directly checkout the code
+        # - checkout
+        # Alternatively, in some workflows, code is checked out near the beginning and saved to a cache.
+        # - restore_cache:
+            # key: your_project_cache-{{ .Environment.CIRCLE_SHA1 }}
+        - civis-integrations-sdk-security-orb/security_checks:
+            dir: ~/my_project   # directory where your project is located
+            exclude_dirs: external_package,tests   # directories in your project you wish to exclude
+  workflows:
+    use-my-orb:
+      jobs:
+        - civis_security_orb
