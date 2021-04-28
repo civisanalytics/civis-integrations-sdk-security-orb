@@ -11,6 +11,12 @@ usage:
       docker:
         - image: circleci/python:3.7   # Change this to match your larger project configuration
       steps:
+        # Before running the security orb, you need to do something to get your code into the environment.
+        # One way is to directly checkout the code
+        # - checkout
+        # Alternatively, in some workflows, code is checked out near the beginning and saved to a cache.
+        # - restore_cache:
+            # key: your_project_cache-{{ .Environment.CIRCLE_SHA1 }}
         - civis-integrations-sdk-security-orb/security_checks:
             dir: ~/my_project   # directory where your project is located
             exclude_dirs: external_package,tests   # directories in your project you wish to exclude
