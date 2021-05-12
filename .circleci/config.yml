@@ -1,13 +1,90 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
+
 orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+  civis-integrations-sdk-security: civisanalytics/civis-integrations-sdk-security-orb@<<pipeline.parameters.dev-orb-version>>
+  orb-tools: circleci/orb-tools@10.0
+  shellcheck: circleci/shellcheck@2.0
+
+# Pipeline Parameters
+## These parameters are used internally by orb-tools. Skip to the Jobs section.
+parameters:
+  run-integration-tests:
+    description: An internal flag to prevent integration test from running before a development version has been created.
+    type: boolean
+    default: false
+  dev-orb-version:
+    description: >
+      The development version of the orb to test.
+      This value is automatically adjusted by the "trigger-integration-tests-workflow" job to correspond with the specific version created by the commit and should not be edited.
+      A "dev:alpha" version must exist for the initial pipeline run.
+    type: string
+    default: "dev:alpha"
+
+jobs:
+  # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
+  integration-test-1:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
+  # This workflow will run on every commit
+  test-pack:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - welcome/run
+      - orb-tools/lint # Lint Yaml files
+      - orb-tools/pack # Pack orb source
+      - shellcheck/check:
+          dir: ./src/scripts
+          exclude: SC2148
+      # Publish development version(s) of the orb.
+      - orb-tools/publish-dev:
+          orb-name: civisanalytics/civis-integrations-sdk-security-orb
+          # Must be a context stored at https://app.circleci.com/settings/organization/github/civisanalytics/contexts
+          context: civis-integrations-sdk-security-orb
+          requires:
+            - orb-tools/lint
+            - orb-tools/pack
+            - shellcheck/check
+      # Trigger an integration workflow to test the
+      # dev:${CIRCLE_SHA1:0:7} version of your orb
+      - orb-tools/trigger-integration-tests-workflow:
+          name: trigger-integration-dev
+          context: civis-integrations-sdk-security-orb
+          requires:
+            - orb-tools/publish-dev
+
+  # This `integration-test_deploy` workflow will only run
+  # when the run-integration-tests pipeline parameter is set to true.
+  # It is meant to be triggered by the "trigger-integration-tests-workflow"
+  # job, and run tests on <your orb>@dev:${CIRCLE_SHA1:0:7}.
+  integration-test_deploy:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      # Run any integration tests defined within the `jobs` key.
+      - integration-test-1
+      # Publish a semver version of the orb. relies on
+      # the commit subject containing the text "[semver:patch|minor|major|skip]"
+      # as that will determine whether a patch, minor or major
+      # version will be published or if publishing should
+      # be skipped.
+      # e.g. [semver:patch] will cause a patch version to be published.
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          orb-name: civisanalytics/civis-integrations-sdk-security-orb
+          context: civis-integrations-sdk-security-orb
+          add-pr-comment: true
+          fail-if-semver-not-indicated: true
+          publish-version-tag: true
+          requires:
+            - integration-test-1
+          filters:
+            branches:
+              # Any PR *to* one of these branches should trigger a production release.
+              # Assuming both the commit and PR are tagged appropriately (l.e. [semver:patch], etc.)
+              # See https://circleci.com/docs/2.0/creating-orbs/#issue-a-new-release
+              only:
+                - master
+                - main
+                - de1133_initial_orb_setup
