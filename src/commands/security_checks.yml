@@ -14,6 +14,8 @@ steps:
       name: Create Environment
       command: |
         python3 -m venv security_checks_venv/
+        source security_checks_venv/bin/activate
+        pip install --upgrade pip
       working_directory: << parameters.dir >>
   - run:
       name: Run flake8
@@ -33,7 +35,6 @@ steps:
       name: Run Safety Check
       command: |
         source security_checks_venv/bin/activate
-        pip install --upgrade pip
         pip install safety
         safety check
       working_directory: << parameters.dir >>
