@@ -29,14 +29,7 @@ steps:
             IFS=''
             EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",./${TEMP_EXCLUDE}"
         done
-        flake8 --exclude ${EXCLUDE_DIR_COMMANDS}
-      working_directory: << parameters.dir >>
-  - run:
-      name: Run Safety Check
-      command: |
-        source security_checks_venv/bin/activate
-        pip install safety
-        safety check
+        flake8 --exclude "${EXCLUDE_DIR_COMMANDS}"
       working_directory: << parameters.dir >>
   - run:
       name: Run Bandit Check
@@ -50,5 +43,14 @@ steps:
             IFS=''
             EXCLUDE_DIR_COMMANDS=${EXCLUDE_DIR_COMMANDS}",./${TEMP_EXCLUDE}"
         done
-        bandit . -r -ll -x ${EXCLUDE_DIR_COMMANDS}
+        bandit . -r -ll -x "${EXCLUDE_DIR_COMMANDS}"
+      working_directory: << parameters.dir >>
+  - run:
+      name: Run Safety Check
+      command: |
+        source security_checks_venv/bin/activate
+        pip install safety
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        safety check
       working_directory: << parameters.dir >>
